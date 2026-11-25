@@ -9,6 +9,18 @@ import { formatDateRu } from "./utils/format"
 import "./App.css"
 
 const FAVORITES_KEY = "crypto_tracker_favorites_v1"
+const THEME_KEY = "crypto-tracker-theme"
+
+function readInitialTheme() {
+  try {
+    const domTheme = document.documentElement.dataset.theme
+    if (domTheme === "light" || domTheme === "dark") return domTheme
+    const saved = localStorage.getItem(THEME_KEY)
+    return saved === "light" ? "light" : "dark"
+  } catch {
+    return "dark"
+  }
+}
 
 function readFavorites() {
   try {
@@ -36,6 +48,24 @@ export default function App() {
   const [sortBy, setSortBy] = useState("market_cap")
   const [favorites, setFavorites] = useState(readFavorites)
   const [selectedCoinId, setSelectedCoinId] = useState(getCoinIdFromHash)
+  const [theme, setTheme] = useState(readInitialTheme)
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    try {
+      localStorage.setItem(THEME_KEY, theme)
+    } catch {
+      // Ignore storage errors
+    }
+    const meta = document.querySelector('meta[name="theme-color"]')
+    if (meta) {
+      meta.setAttribute("content", theme === "light" ? "#f3f6fc" : "#05070e")
+    }
+  }, [theme])
+
+  const toggleTheme = useCallback(() => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"))
+  }, [])
 
   const loadCoins = useCallback(async ({ force = false, signal } = {}) => {
     setLoadState((prev) =>
@@ -191,10 +221,6 @@ export default function App() {
       <div className="app-container">
         <header className="hero-header">
           <div className="hero-brand">
-            <div className="live-pill">
-              <span className="live-dot" aria-hidden="true" />
-              <span>LIVE MARKET</span>
-            </div>
             <h1 className="hero-title">Crypto Tracker</h1>
             <p className="hero-subtitle">
               Топ-100 криптовалют по капитализации · интерактивные графики и
@@ -208,6 +234,50 @@ export default function App() {
                 Обновлено: {formatDateRu(updatedAt, { withTime: true })}
               </span>
             )}
+            <button
+              type="button"
+              className="theme-toggle-btn glass-panel"
+              onClick={toggleTheme}
+              aria-label={
+                theme === "dark"
+                  ? "Переключить на светлую тему"
+                  : "Переключить на тёмную тему"
+              }
+              title={
+                theme === "dark"
+                  ? "Переключить на светлую тему"
+                  : "Переключить на тёмную тему"
+              }
+            >
+              {theme === "dark" ? (
+                <svg
+                  className="theme-toggle-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.9"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="12" r="4" />
+                  <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32 1.41-1.41" />
+                </svg>
+              ) : (
+                <svg
+                  className="theme-toggle-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.9"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              )}
+            </button>
             <button
               type="button"
               className="btn-primary refresh-btn"

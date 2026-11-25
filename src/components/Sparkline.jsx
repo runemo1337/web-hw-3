@@ -33,7 +33,7 @@ export default function Sparkline({ prices, isPositive, width = 220, height = 48
     .join(" ")
 
   const areaPath = `${linePath} L${width},${height} L0,${height} Z`
-  const strokeColor = isPositive ? "#10b981" : "#f43f5e"
+  const strokeColor = isPositive ? "var(--positive)" : "var(--negative)"
 
   return (
     <svg

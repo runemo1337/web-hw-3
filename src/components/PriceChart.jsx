@@ -148,7 +148,9 @@ export default function PriceChart({ coin }) {
       ? chartGeometry.coords[hoverIndex]
       : null
 
-  const strokeColor = chartGeometry?.isPositive ? "#10b981" : "#f43f5e"
+  const strokeColor = chartGeometry?.isPositive
+    ? "var(--positive)"
+    : "var(--negative)"
 
   const tooltipLeftPct = activePoint
     ? Math.max(12, Math.min(88, (activePoint.x / SVG_WIDTH) * 100))
@@ -304,7 +306,7 @@ export default function PriceChart({ coin }) {
                     y1={PAD_Y / 2}
                     x2={activePoint.x}
                     y2={SVG_HEIGHT - PAD_Y / 2}
-                    stroke="rgba(226, 232, 240, 0.35)"
+                    stroke="var(--chart-crosshair)"
                     strokeWidth="1.2"
                     strokeDasharray="4 4"
                   />
@@ -320,7 +322,7 @@ export default function PriceChart({ coin }) {
                     cy={activePoint.y}
                     r="4.2"
                     fill={strokeColor}
-                    stroke="#05070e"
+                    stroke="var(--bg-base)"
                     strokeWidth="2"
                   />
                 </>
